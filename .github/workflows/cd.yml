@@ -18,37 +18,9 @@ jobs:
         echo "${{ secrets.EC2_KEY }}" > ~/DjangoCDKey.pem
         chmod 400 ~/DjangoCDKey.pem
 
-    - name: Update Instance and Install Dependencies
+    - name: Deploy Code
       run: |
-        ssh -o StrictHostKeyChecking=no -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-          sudo yum update -y &&
-          sudo yum install -y git docker amazon-linux-extras &&
-          sudo amazon-linux-extras enable python3.8 &&
-          sudo yum install -y python3.8 python3.8-pip python3.8-crypt &&
-          
-          # Enable and start Docker
-          sudo systemctl enable docker &&
-          sudo systemctl start docker &&
-          
-          # Install Docker Compose
-          sudo curl -L \"https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\$(uname -s)-\$(uname -m)\" -o /usr/local/bin/docker-compose &&
-          sudo chmod +x /usr/local/bin/docker-compose &&
-          docker-compose --version
-        "
-
-    - name: Clone or Pull Repository
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
-          if [ ! -d /home/ec2-user/Django_Project ]; then
-            git clone https://github.com/NoManNayeem/Django_Project.git /home/ec2-user/Django_Project;
-          else
-            cd /home/ec2-user/Django_Project &&
-            git pull origin main;
-          fi
-        "
-
-    - name: Run Dockerized App
-      run: |
+        scp -o StrictHostKeyChecking=no -i ~/DjangoCDKey.pem -r ./* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/Django_Project/
         ssh -o StrictHostKeyChecking=no -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
           cd /home/ec2-user/Django_Project &&
           docker-compose up --build -d
