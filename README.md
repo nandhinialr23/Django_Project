@@ -5,9 +5,14 @@
 A sample Django application showcasing CI/CD implementation using GitHub Actions and AWS. This project demonstrates creating, containerizing, and automating deployments for a Python-based web application.
 
 ---
-# Medium Story: Find Full Tutorial
-https://medium.com/@nomannayeem/complete-ci-cd-with-github-actions-and-aws-for-python-developers-a-step-by-step-guide-92807f6167ee
+# Medium Story: Find Full Tutorial  
+
+![Complete CI/CD with GitHub Actions and AWS for Python Developers](./screenshots/Medium.png)
+
+Click the image or the link to read the full tutorial.  
+[Complete CI/CD with GitHub Actions and AWS for Python Developers - A Step-by-Step Guide](https://medium.com/@nomannayeem/complete-ci-cd-with-github-actions-and-aws-for-python-developers-a-step-by-step-guide-92807f6167ee)
 ---
+
 
 ---
 
