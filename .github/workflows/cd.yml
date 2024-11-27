@@ -1,0 +1,49 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set Up SSH Key
+      run: |
+        echo "${{ secrets.EC2_KEY }}" > ~/DjangoCDKey.pem
+        chmod 400 ~/DjangoCDKey.pem
+
+    - name: Update Instance and Install Dependencies
+      run: |
+        ssh -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          sudo yum update -y &&
+          sudo yum install -y git docker &&
+          sudo systemctl enable docker &&
+          sudo systemctl start docker &&
+          sudo curl -L \"https://github.com/docker/compose/releases/download/1.29.2/docker-compose-\$(uname -s)-\$(uname -m)\" -o /usr/local/bin/docker-compose &&
+          sudo chmod +x /usr/local/bin/docker-compose &&
+          docker-compose --version
+        "
+
+    - name: Clone or Pull Repository
+      run: |
+        ssh -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          if [ ! -d /home/ec2-user/Django_Project ]; then
+            git clone https://github.com/NoManNayeem/Django_Project.git /home/ec2-user/Django_Project;
+          else
+            cd /home/ec2-user/Django_Project &&
+            git pull origin main;
+          fi
+        "
+
+    - name: Run Dockerized App
+      run: |
+        ssh -i ~/DjangoCDKey.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "
+          cd /home/ec2-user/Django_Project &&
+          docker-compose up --build -d
+        "
